@@ -3,35 +3,36 @@
 #include "config.h"
 #include "../lib/tomlc17.h"
 #include "menu.h"
+#include "util.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 struct menu_item *parse_menu_array(toml_datum_t arr, size_t *out_count);
 
-struct config
+struct config *
 load_config(const char *path)
 {
+    struct config *conf = safe_calloc(1, sizeof(*conf));
+
     toml_result_t result = toml_parse_file_ex(path);
 
     if (!result.ok) {
-        fprintf(stderr, "TOML parse error: %s\n", result.errmsg);
-        return (struct config){ NULL, 0 };
+        free(conf);
+        error(result.errmsg, 0);
     }
 
     toml_datum_t root_menu = toml_seek(result.toptab, "config.menu");
     if (root_menu.type != TOML_ARRAY) {
-        fprintf(stderr, "No config.menu found or invalid\n");
+        free(conf);
         toml_free(result);
-        return (struct config){ NULL, 0 };
+        error("missing or invalid 'config.menu' property in config", 0);
     }
 
-    size_t root_count;
-    struct menu_item *root_items = parse_menu_array(root_menu, &root_count);
+    conf->menu_items = parse_menu_array(root_menu, &conf->item_count);
 
     toml_free(result);
-
-    return (struct config){ root_items, root_count };
+    return conf;
 }
 
 struct menu_item *

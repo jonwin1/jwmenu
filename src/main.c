@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "menu.h"
+#include "util.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,24 +15,17 @@ get_config_path()
 
     const char *xdg = getenv("XDG_CONFIG_HOME");
     if (!xdg) {
-        fprintf(stderr, "get_config_path: XDG_CONFIG_HOME is not set\n");
-        return NULL;
+        error("get_config_path: XDG_CONFIG_HOME is not set", 0);
     }
 
     size_t len = strlen(xdg) + 1 + strlen(file) + 1;
 
-    char *path = malloc(len);
-    if (!path) {
-        fprintf(stderr, "get_config_path: malloc failed to allocate memory\n");
-        return NULL;
-    }
+    char *path = safe_calloc(1, len);
 
     snprintf(path, len, "%s/%s", xdg, file);
 
     if (access(path, R_OK) != 0) {
-        fprintf(stderr, "Cannot access config file: %s\n", path);
-        free(path);
-        return NULL;
+        error("Cannot access config file: ", path);
     }
 
     return path;
@@ -46,10 +40,10 @@ main(void)
         return 1;
     }
 
-    struct config conf = load_config(path);
+    struct config *conf = load_config(path);
     // free(path);
 
-    run_menu(conf.menu_items, conf.item_count);
+    run_menu(conf->menu_items, conf->item_count);
 
     return 0;
 }

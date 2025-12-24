@@ -1,5 +1,5 @@
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 #include "menu.h"
 
@@ -8,6 +8,8 @@ struct config {
     size_t item_count;
 };
 
-struct config load_config(const char *path);
+struct config *load_config(const char *path);
+
+void free_config(struct config *conf);
 
 #endif

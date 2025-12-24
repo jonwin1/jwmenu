@@ -5,7 +5,7 @@ LIBS =
 
 TARGET = jwmenu
 
-SRC = src/main.c src/menu.c src/config.c lib/tomlc17.c
+SRC = src/main.c src/menu.c src/config.c src/util.c lib/tomlc17.c
 OBJ = $(SRC:.c=.o)
 
 # Default target
