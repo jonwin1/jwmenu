@@ -16,6 +16,10 @@ struct menu_item {
     size_t submenu_count;
 };
 
+// Return 0 if return to parent menu if one exists, or 1 to close all parent
+// menus.
 int run_menu(struct menu_item *items, size_t count);
+
+void free_menu_item(struct menu_item item);
 
 #endif // !MENU_H

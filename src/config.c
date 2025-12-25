@@ -35,6 +35,16 @@ load_config(const char *path)
     return conf;
 }
 
+void
+free_config(struct config *conf)
+{
+    for (size_t i = 0; i < conf->item_count; i++) {
+        free_menu_item(conf->menu_items[i]);
+    }
+    free(conf->menu_items);
+    free(conf);
+}
+
 struct menu_item *
 parse_menu_table(toml_datum_t tbl)
 {

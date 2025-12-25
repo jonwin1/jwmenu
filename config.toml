@@ -6,8 +6,8 @@ label = "item1"
 command = "echo 1"
 
 [[config.menu]]
-label = "item2"
-command = "echo 2"
+label = "bad"
+command = "eco 2"
 
 [[config.menu]]
 label = "sub1"

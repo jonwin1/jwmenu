@@ -93,3 +93,19 @@ run_menu(struct menu_item *items, size_t count)
         }
     }
 }
+
+void
+free_menu_item(struct menu_item item)
+{
+    free(item.label);
+
+    if (item.command != NULL) {
+        free(item.command);
+        return;
+    }
+
+    for (size_t i = 0; i < item.submenu_count; i++) {
+        free_menu_item(item.submenu[i]);
+    }
+    free(item.submenu);
+}

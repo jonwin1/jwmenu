@@ -24,5 +24,7 @@ main(const int argc, const char **argv)
 
     run_menu(conf->menu_items, conf->item_count);
 
+    free_config(conf);
+
     return 0;
 }
