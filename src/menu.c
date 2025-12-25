@@ -9,7 +9,7 @@
 
 static int show_menu(struct menu_item *items, size_t count);
 
-int
+static int
 show_menu(struct menu_item *items, size_t count)
 {
     int inpipe[2];  // parent -> rofi
@@ -36,7 +36,7 @@ show_menu(struct menu_item *items, size_t count)
 
         execlp("rofi", "rofi", "-dmenu", "-format", "i", "-i", NULL);
 
-        _exit(1);
+        exit(EXIT_SUCCESS);
     }
 
     // Parent
@@ -74,15 +74,15 @@ int
 run_menu(struct menu_item *items, size_t count)
 {
     while (true) {
-        int idx = show_menu(items, count);
-        if (idx < 0) {
+        int selected = show_menu(items, count);
+        if (selected < 0) {
             return 0;
         }
 
-        struct menu_item *item = &items[idx];
+        struct menu_item *item = &items[selected];
 
         if (item->command) {
-            (void)system(item->command);
+            system(item->command);
             return 1;
         } else if (item->submenu) {
             int exit = run_menu(item->submenu, item->submenu_count);
