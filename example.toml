@@ -1,0 +1,43 @@
+[config]
+label = "Example Menu"
+
+[[config.menu]]
+label = "󰎤    Simple command"
+command = "echo simple"
+
+[[config.menu]]
+label = "󰎧    Multiline command"
+command = """
+echo multi
+echo line
+echo command
+"""
+
+[[config.menu]]
+label = "󰎪    Submenu →"
+
+[[config.menu.submenu]]
+label = "Subsubmenu →"
+
+[[config.menu.submenu.submenu]]
+label = "1"
+command = "echo 1"
+
+[[config.menu.submenu.submenu]]
+label = "2"
+command = "echo 2"
+
+[[config.menu.submenu]]
+label = "󱠡    hello"
+command = "echo hello"
+
+[[config.menu]]
+label = "󰎭    Another Submenu →"
+
+[[config.menu.submenu]]
+label = "1"
+command = "echo 1"
+
+[[config.menu.submenu]]
+label = "2"
+command = "echo 2"
