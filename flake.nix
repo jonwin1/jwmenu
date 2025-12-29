@@ -32,7 +32,7 @@
             ];
 
             buildInputs = with pkgs; [
-              # Libraries
+              rofi
             ];
 
             buildPhase = ''
