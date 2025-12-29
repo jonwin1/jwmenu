@@ -1139,8 +1139,12 @@ static int parse_inline_table(parser_t *pp, token_t tok,
     // Got an RBRACE: done!
     if (tok.toktyp == TOK_RBRACE) {
       if (was_comma) {
+        /*
         return RETERROR(pp->ebuf, tok.lineno,
                         "extra comma before closing brace");
+        */
+        // extra comma before RBRACE is allowed for v1.1
+        (void)0;
       }
       break;
     }
@@ -1154,14 +1158,16 @@ static int parse_inline_table(parser_t *pp, token_t tok,
       return RETERROR(pp->ebuf, tok.lineno, "unexpected comma");
     }
 
+    // Newline not allowed in inline table.
+    // newline is allowed in v1.1
+    if (tok.toktyp == TOK_ENDL) {
+      // return RETERROR(pp->ebuf, tok.lineno, "unexpected newline");
+      continue;
+    }
+
     // Not a comma, but need a comma: error!
     if (need_comma) {
       return RETERROR(pp->ebuf, tok.lineno, "missing comma");
-    }
-
-    // Newline not allowed in inline table.
-    if (tok.toktyp == TOK_ENDL) {
-      return RETERROR(pp->ebuf, tok.lineno, "unexpected newline");
     }
 
     // Get the keyparts
@@ -1560,22 +1566,40 @@ static int parse_norm(parser_t *pp, token_t tok, span_t *ret_span) {
       *dst++ = '\b';
       p += 2;
       continue;
-    case 'f':
-      *dst++ = '\f';
-      p += 2;
-      continue;
     case 't':
       *dst++ = '\t';
-      p += 2;
-      continue;
-    case 'r':
-      *dst++ = '\r';
       p += 2;
       continue;
     case 'n':
       *dst++ = '\n';
       p += 2;
       continue;
+    case 'f':
+      *dst++ = '\f';
+      p += 2;
+      continue;
+    case 'r':
+      *dst++ = '\r';
+      p += 2;
+      continue;
+    case 'e':
+      *dst++ = '\e';
+      p += 2;
+      continue;
+    case 'x': {
+      char buf[3];
+      memcpy(buf, p + 2, 2);
+      buf[2] = 0;
+      int32_t ucs = strtol(buf, 0, 16);
+      int n = ucs_to_utf8(ucs, dst);
+      if (n < 0) {
+        return RETERROR(pp->ebuf, tok.lineno, "error converting UCS %s to UTF8",
+                        buf);
+      }
+      dst += n;
+      p += 4;
+      continue;
+    }
     case 'u':
     case 'U': {
       char buf[9];
@@ -1752,12 +1776,25 @@ static int scan_multiline_string(scanner_t *sp, token_t *tok) {
     }
     // ch is backslash; handle escape char
     ch = S_GET();
-    if (ch && strchr("\"\\bfnrt", ch)) {
+    if (ch && strchr("btnfre\"\\", ch)) {
       // skip \", \\, \b, \f, \n, \r, \t
       continue;
     }
-    if (ch == 'u' || ch == 'U') {
-      int top = (ch == 'u' ? 4 : 8);
+    int top = 0;
+    switch (ch) {
+    case 'x':
+      top = 2;
+      break;
+    case 'u':
+      top = 4;
+      break;
+    case 'U':
+      top = 8;
+      break;
+    default:
+      break;
+    }
+    if (top) {
       for (int i = 0; i < top; i++) {
         if (!is_hex_char(S_GET())) {
           return RETERROR(sp->ebuf, sp->lineno,
@@ -1819,21 +1856,30 @@ static int scan_string(scanner_t *sp, token_t *tok) {
     }
     // ch is backslash; handle escape char
     ch = S_GET();
-    if (ch && strchr("\"\\bfnrt", ch)) {
-      // skip \", \\, \b, \f, \n, \r, \t
+    if (ch && strchr("btnfre\"\\", ch)) {
+      // skip \b, \t, \n, \f, \r, \e, \", \\  .
       continue;
     }
-    if (ch == 'u' || ch == 'U') {
-      int top = (ch == 'u' ? 4 : 8);
-      for (int i = 0; i < top; i++) {
-        if (!is_hex_char(S_GET())) {
-          return RETERROR(sp->ebuf, sp->lineno,
-                          "expect %d hex digits after \\%c", top, ch);
-        }
+    int top = 0;
+    switch (ch) {
+    case 'x':
+      top = 2;
+      break;
+    case 'u':
+      top = 4;
+      break;
+    case 'U':
+      top = 8;
+      break;
+    default:
+      return RETERROR(sp->ebuf, sp->lineno, "bad escape char in string");
+    }
+    for (int i = 0; i < top; i++) {
+      if (!is_hex_char(S_GET())) {
+        return RETERROR(sp->ebuf, sp->lineno, "expect %d hex digits after \\%c",
+                        top, ch);
       }
-      continue;
     }
-    return RETERROR(sp->ebuf, sp->lineno, "bad escape char in string");
   }
   tok->str.len = sp->cur - tok->str.ptr;
 
@@ -1991,23 +2037,40 @@ static int read_time(const char *p, int *hour, int *minute, int *second,
   const char *pp = p;
   int n;
   *hour = *minute = *second = *usec = 0;
+  // scan hours
   n = read_int(p, hour);
   if (n != 2 || p[2] != ':') {
     return 0;
   }
-  n = read_int(p += 3, minute);
-  if (n != 2 || p[2] != ':') {
+  p += 3;
+
+  // scan minutes
+  n = read_int(p, minute);
+  if (n != 2) {
     return 0;
   }
-  n = read_int(p += 3, second);
+  if (p[2] != ':') {
+    // seconds are optional in v1.1
+    p += 2;
+    return p - pp;
+  }
+  p += 3;
+
+  // scan seconds
+  n = read_int(p, second);
   if (n != 2) {
     return 0;
   }
   p += 2;
+
   if (*p != '.') {
     return p - pp;
   }
   p++; // skip the period
+  if (!isdigit(*p)) {
+    // trailing period
+    return 0;
+  }
   int micro_factor = 100000;
   while (isdigit(*p) && micro_factor) {
     *usec += (*p - '0') * micro_factor;
@@ -2132,7 +2195,7 @@ static int scan_timestamp(scanner_t *sp, token_t *tok) {
   }
   toktyp = TOK_DATETIMETZ;
   p += n;
-  if (!(0 <= tzminute && tzminute <= 60)) {
+  if (!(0 <= tzminute && tzminute < 60)) {
     return RETERROR(sp->ebuf, lineno, "invalid timezone");
   }
   tz = (tzhour * 60 + tzminute) * (tzsign == '-' ? -1 : 1);
