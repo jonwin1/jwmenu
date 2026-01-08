@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2025-2026 Jonatan Wincent <jonatan.wincent@proton.me>
+# SPDX-License-Identifier: MIT
+[config]
+label = "System Menu"
+
+[[config.menu]]
+label = "    Toggle →"
+
+[[config.menu.submenu]]
+label = "    Idle inhibitor"
+command = "jonwin-toggle-idle-inhibitor"
+
+[[config.menu.submenu]]
+label = "󰖔    Nightlight"
+command = "jonwin-toggle-nightlight"
+
+[[config.menu]]
+label = "    Audio"
+command = "jonwin-launch-or-focus pavucontrol"
+
+[[config.menu]]
+label = "    Network"
+command = "jonwin-launch-or-focus-tui nmtui"
+
+[[config.menu]]
+label = "󰂯    Bluetooth"
+command = "jonwin-launch-or-focus-tui bluetui"

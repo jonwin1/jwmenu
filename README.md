@@ -122,7 +122,7 @@ label = "nested item"
 command = "notify-send 'Hello from submenu'"
 ```
 
-See a larger example in [`config/example.toml`](config/example.toml).
+See more examples in [`config/`](config/).
 
 ### Semantics
 
@@ -136,25 +136,26 @@ See a larger example in [`config/example.toml`](config/example.toml).
 
 ```text
 .
-├── src/
-│   ├── main.c        # Entry point
-│   ├── menu.c        # Menu logic and rofi interaction
-│   ├── menu.h
-│   ├── config.c      # TOML parsing
-│   ├── config.h
-│   ├── util.c        # Helper functions
-│   └── util.h
 ├── config/           # Example menus
-│   ├── example.toml
 │   └── ...
 ├── lib/
 │   ├── tomlc17.c     # TOML parsing library
 │   └── tomlc17.h
+├── LICENSES/
+│   └── ...
+├── src/
+│   ├── config.c      # TOML parsing
+│   ├── config.h
+│   ├── main.c        # Entry point
+│   ├── menu.c        # Menu logic and rofi interaction
+│   ├── menu.h
+│   ├── util.c        # Helper functions
+│   └── util.h
 ├── flake.lock        # Flake dependencies lock
 ├── flake.nix         # Nix package and devshell definition
-├── LICENSE
 ├── Makefile
-└── README.md
+├── README.md
+└── REUSE.toml
 ```
 
 ## License
