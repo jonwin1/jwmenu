@@ -10,8 +10,25 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-static int show_menu(struct menu_item *items, size_t count);
-
+/**
+ * @brief Display a menu using `rofi` and get the selected index.
+ *
+ * @internal
+ * 
+ * The function works as follows:
+ * 1. Creates two pipes for bidirectional communication with `rofi`.
+ * 2. Forks a child process that executes `rofi` in dmenu mode.
+ * 3. Writes the menu labels to `rofi` via the input pipe.
+ * 4. Reads the selected index from `rofi` via the output pipe.
+ * 5. Returns the index of the selected item, or -1.
+ *
+ * @param items     Pointer to an array of menu items to display.
+ * @param count     Number of menu items in the array.
+ *
+ * @return
+ * - Selected item index if successful.
+ * - -1 if an error occurred or nothing was selected (user pressed ESC).
+ */
 static int
 show_menu(struct menu_item *items, size_t count)
 {
@@ -51,7 +68,7 @@ show_menu(struct menu_item *items, size_t count)
     for (size_t i = 0; i < count; i++) {
         fprintf(to_rofi, "%s\n", items[i].label);
     }
-    fclose(to_rofi); // IMPORTANT: signal EOF
+    fclose(to_rofi); // Signal EOF
 
     // Read selection
     FILE *from_rofi = fdopen(outpipe[0], "r");
@@ -79,19 +96,19 @@ run_menu(struct menu_item *items, size_t count)
     while (true) {
         int selected = show_menu(items, count);
         if (selected < 0) {
-            return 0;
+            return 0; // Return to parent menu
         }
 
         struct menu_item *item = &items[selected];
 
         if (item->command) {
             system(item->command);
-            return 1;
+            return 1; // Exit all menus
         } else if (item->submenu) {
             int exit = run_menu(item->submenu, item->submenu_count);
 
-            if (exit) {
-                return 1;
+            if (exit != 0) {
+                return 1; // Exit all menus
             }
         }
     }
