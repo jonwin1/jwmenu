@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025-2026 Jonatan Wincent <jonatan.wincent@proton.me>
+SPDX-License-Identifier: MIT
+-->
+
 # JWMenu
 
 `JWMenu` is a small, configurable menu runner built on top of
@@ -154,7 +159,7 @@ See a larger example in [`config/example.toml`](config/example.toml).
 
 ## License
 
-MIT
+This project is licensed under the MIT License. See LICENSES/MIT.txt.
 
 ## Acknowledgements
 

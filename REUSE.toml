@@ -1,0 +1,11 @@
+version = 1
+
+[[annotations]]
+path = ["lib/tomlc17.c", "lib/tomlc17.h"]
+SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "2024-2025 CK Tan, https://github.com/cktan/tomlc17/blob/main/LICENSE"
+
+[[annotations]]
+path = [".clang-format", ".envrc", ".gitignore", "flake.lock"]
+SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "2025-2026 Jonatan Wincent <jonatan.wincent@proton.me>"

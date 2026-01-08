@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025-2026 Jonatan Wincent <jonatan.wincent@proton.me>
+# SPDX-License-Identifier: MIT
 CC = gcc
 CFLAGS = -std=c17 -Wall -Wextra -Wpedantic -g
 LDFLAGS =

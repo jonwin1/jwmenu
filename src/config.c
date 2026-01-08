@@ -1,3 +1,6 @@
+/* SPDX-FileCopyrightText: 2025-2026 Jonatan Wincent <jonatan.wincent@proton.me>
+ * SPDX-License-Identifier: MIT
+ */
 #define _POSIX_C_SOURCE 200809L
 
 #include "config.h"

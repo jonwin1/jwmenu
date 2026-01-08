@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025-2026 Jonatan Wincent <jonatan.wincent@proton.me>
+# SPDX-License-Identifier: MIT
 {
   description = "jwmenu";
 
@@ -59,6 +61,8 @@
             buildInputs = with pkgs; [
               gdb
               valgrind
+
+              reuse
 
               man-pages
               man-pages-posix
