@@ -11,7 +11,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @brief Parse a TOML array into an array of menu items.
+ *
+ * @internal
+ *
+ * @param arr       TOML array datum to parse.
+ * @param out_count Pointer to store the number of items parsed.
+ * @return          Pointer to a dynamically allocated array of menu items.
+ */
 struct menu_item *parse_menu_array(toml_datum_t arr, size_t *out_count);
+
+/**
+ * @brief Parse a TOML table into a menu_item.
+ *
+ * @internal
+ *
+ * @param tbl   TOML table datum representing a menu item.
+ * @return      Pointer to a dynamically allocated menu_item.
+ */
+struct menu_item *parse_menu_table(toml_datum_t tbl);
 
 struct config *
 load_config(const char *path)
@@ -52,10 +71,12 @@ struct menu_item *
 parse_menu_table(toml_datum_t tbl)
 {
     struct menu_item *item = calloc(1, sizeof(*item));
+
     toml_datum_t label = toml_get(tbl, "label");
-    if (label.type == TOML_STRING) { // TODO: Should be error otherwise?
-        item->label = strdup(label.u.s);
+    if (label.type != TOML_STRING) {
+        error("missing or invalid 'label' in menu item", 0);
     }
+    item->label = strdup(label.u.s);
 
     toml_datum_t cmd = toml_get(tbl, "command");
     toml_datum_t submenu = toml_get(tbl, "submenu");
@@ -67,10 +88,9 @@ parse_menu_table(toml_datum_t tbl)
     } else if (submenu.type == TOML_ARRAY) {
         item->submenu = parse_menu_array(submenu, &item->submenu_count);
         item->command = NULL;
-    } else { // TODO: Error?
-        item->command = NULL;
-        item->submenu = NULL;
-        item->submenu_count = 0;
+    } else {
+        error(item->label,
+              ": missing or invalid 'command' or 'submenu' in menu item");
     }
 
     return item;
