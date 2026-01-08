@@ -8,6 +8,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+/**
+ * @brief Main entry point of the program.
+ *
+ * Usage: `jwmenu 'path/to/config.toml'`
+ *
+ * @param argc  Argument count.
+ * @param argv  Argument values.
+ * @return      Exit code (0 on success, exits with failure on errors).
+ */
 int
 main(const int argc, const char **argv)
 {
