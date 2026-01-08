@@ -15,6 +15,8 @@ execute a command or open another submenu.
 It can be used to build system menus, power menus, application launchers,
 or any other structured rofi-based workflows.
 
+[Read more about why I created JWMenu.](https://jonwin.se/posts/jwmenu/)
+
 ## Features
 
 - Hierarchical menus with arbitrary nesting
