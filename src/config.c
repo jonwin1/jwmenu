@@ -70,7 +70,7 @@ free_config(struct config *conf)
 struct menu_item *
 parse_menu_table(toml_datum_t tbl)
 {
-    struct menu_item *item = calloc(1, sizeof(*item));
+    struct menu_item *item = safe_calloc(1, sizeof(*item));
 
     toml_datum_t label = toml_get(tbl, "label");
     if (label.type != TOML_STRING) {
@@ -100,7 +100,7 @@ struct menu_item *
 parse_menu_array(toml_datum_t arr, size_t *out_count)
 {
     size_t n = arr.u.arr.size;
-    struct menu_item *items = calloc(n, sizeof(*items));
+    struct menu_item *items = safe_calloc(n, sizeof(*items));
     for (size_t i = 0; i < n; i++) {
         toml_datum_t elem = arr.u.arr.elem[i];
         if (elem.type != TOML_TABLE) {
